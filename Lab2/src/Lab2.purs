@@ -53,7 +53,7 @@ zip lst1 lst2 =
                     _ -> acc
             _ -> acc
     in 
-         (go lst1 lst2 Nil)
+         reverse (go lst1 lst2 Nil)
 {-unzip 
 unzip є зворотним до zip. Ви повинні мати можливість взяти результат zip і використати його, щоб розархівувати та отримати ваші вихідні списки назад, припускаючи, що ви почали зі списків однакового розміру.
 -} 
@@ -67,7 +67,7 @@ unzip lst =
                     val2 -> go xs (val1:acc1) (val2:acc2)
             _ -> Tuple acc1 acc2 
     in
-        (go lst Nil Nil)
+        go (reverse lst) Nil Nil
 
 {-filter
 filter takes a Predicate Function to KEEP or filter-in elements when the Predicate returns true.
