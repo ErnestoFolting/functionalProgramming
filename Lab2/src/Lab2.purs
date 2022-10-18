@@ -28,7 +28,7 @@ findIndex pred lst = case lst of
 
 predicate :: Int -> Boolean
 predicate a = case a of
-    -5-> true
+    val | val > 3 -> true
     _ -> false
 
 {-findLastIndex
@@ -69,10 +69,65 @@ unzip lst =
     in
         (go lst Nil Nil)
 
+{-filter
+filter takes a Predicate Function to KEEP or filter-in elements when the Predicate returns true.
+-} 
+filter :: forall a. (a -> Boolean) -> List a -> List a
+filter pred lst = case lst of
+    (x:xs) -> case pred x of
+        true -> x : (filter pred xs)
+        false -> filter pred xs 
+    _ -> Nil                     
+
+{-tail recursion filter
+Оптимізуйте реалізацію фільтра використовуючи підхід хвостової оптимізації
+-} 
+tailFilter :: forall a. (a -> Boolean) -> List a -> List a
+tailFilter pred lst = 
+    let 
+        go :: forall a. (a -> Boolean) -> List a ->List a -> List a
+        go pred lst acc = case lst of
+            (x:xs) -> case pred x of
+                true -> go pred xs (x:acc)
+                false -> go pred xs acc
+            _ -> acc
+    in
+        reverse (go pred lst Nil)
+
+{-take
+take поверне вказану кількість елементів зі списку або стільки, скільки зможе, якщо список замалий.
+-} 
+take :: forall a. Int -> List a -> List a
+take number lst = case lst of
+    (x:xs) -> case number of
+        val| val > 0 -> x : take (number-1) xs
+        _ -> Nil
+    _ -> Nil
+
+{-tail recursion take 
+Оптимізуйте реалізацію take використовуючи підхід хвостової оптимізації
+-} 
+
+tailTake :: forall a. Int -> List a -> List a
+tailTake number lst = 
+    let 
+        go :: forall a. Int -> List a -> List a -> List a
+        go number lst acc = case lst of
+            (x:xs) -> case number of
+                val| val > 0 ->
+                    go (number-1) xs (x:acc)
+                _ -> acc
+            _ -> acc
+    in reverse(go number lst Nil)
+
 test :: Effect Unit
 test = do 
-    log $ show $ findIndex predicate (2:(3:(1:(2:Nil))))
+    log $ show $ findIndex predicate (2:(3:(8:(2:Nil))))
     log $ show $ findLastIndex predicate (2:(3:(1:(4:Nil))))   
     log $ show $ zip (2:(3:(1:(2:Nil)))) (5:(2:(3:(1:(2:Nil)))))
     log $ show $ unzip(zip (2:(3:(1:(2:Nil)))) (5:(2:(3:(1:(2:Nil))))))
+    log $ show $ filter predicate (7:(3:(1:(4:Nil))))
+    log $ show $ tailFilter predicate (7:(3:(1:(4:Nil))))
+    log $ show $ take 8 (7:(3:(1:(4:Nil))))
+    log $ show $ tailTake 2 (7:(3:(1:(4:Nil))))
     
